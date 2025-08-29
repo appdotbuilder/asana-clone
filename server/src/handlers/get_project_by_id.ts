@@ -1,8 +1,25 @@
+import { db } from '../db';
+import { projectsTable } from '../db/schema';
 import { type GetByIdInput, type Project } from '../schema';
+import { eq } from 'drizzle-orm';
 
-export async function getProjectById(input: GetByIdInput): Promise<Project | null> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is fetching a specific project by ID from the database.
-    // Should return null if project is not found.
-    return Promise.resolve(null);
-}
+export const getProjectById = async (input: GetByIdInput): Promise<Project | null> => {
+  try {
+    // Query project by ID
+    const results = await db.select()
+      .from(projectsTable)
+      .where(eq(projectsTable.id, input.id))
+      .execute();
+
+    // Return null if project not found
+    if (results.length === 0) {
+      return null;
+    }
+
+    // Return the found project
+    return results[0];
+  } catch (error) {
+    console.error('Failed to get project by ID:', error);
+    throw error;
+  }
+};
